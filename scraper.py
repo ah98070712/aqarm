@@ -9,7 +9,7 @@ import time
 def setup_driver():
     options = Options()
     options.headless = True
-    # Correctly configure the service for geckodriver
+    options.binary_location = '/usr/bin/firefox'  # Explicitly specify binary location
     service = Service(log_path='geckodriver.log')
     driver = webdriver.Firefox(service=service, options=options)
     return driver
