@@ -31,8 +31,10 @@ jobs:
       - name: Setup ChromeDriver
         run: |
           echo "Setting up ChromeDriver..."
-          CHROME_VERSION=$(chromium-browser --version | grep -oP '\\d+\\.' | head -1 | tr -d '.')
+          CHROME_VERSION=$(chromium-browser --version | grep -o -E '[0-9]+')
           CHROMEDRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION")
+          echo "Detected Chrome version: $CHROME_VERSION"
+          echo "Detected ChromeDriver version: $CHROMEDRIVER_VERSION"
           wget -N "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
           unzip chromedriver_linux64.zip -d $HOME
           rm chromedriver_linux64.zip
