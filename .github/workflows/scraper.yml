@@ -10,7 +10,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          token: "${{ secrets.GIT_TOKEN }}"
+          token: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -28,13 +28,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y chromium-browser
 
+      - name: Install Chrome
+        run: |
+          wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          sudo apt-get update
+          sudo apt-get install -y google-chrome-stable
+
       - name: Setup ChromeDriver
         run: |
           echo "Setting up ChromeDriver..."
-          CHROME_VERSION=$(chromium-browser --version | grep -o -E '[0-9]+\.[0-9]+' | head -n1)
-          MAJOR_VERSION="${CHROME_VERSION%%.*}"
+          GOOGLE_CHROME_VERSION=$(google-chrome --version | grep -oP '\\d+\\.\\d+\\.\\d+')
+          MAJOR_VERSION=$(echo $GOOGLE_CHROME_VERSION | cut -d '.' -f 1)
           CHROMEDRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$MAJOR_VERSION")
-          echo "Detected Chrome version: $CHROME_VERSION"
+          echo "Detected Chrome version: $GOOGLE_CHROME_VERSION"
           echo "Detected ChromeDriver version: $CHROMEDRIVER_VERSION"
           wget -N "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
           unzip chromedriver_linux64.zip -d $HOME
@@ -44,12 +51,12 @@ jobs:
 
       - name: Test Version
         run: |
-          chromium-browser --version
+          google-chrome --version
           chromedriver --version
 
       - name: Run scraper
         env:
-          PATH: /usr/bin/chromium-browser:/usr/local/bin/chromedriver:$PATH
+          PATH: /usr/bin/google-chrome:/usr/local/bin/chromedriver:$PATH
         run: python scraper.py
 
       - name: Push results
