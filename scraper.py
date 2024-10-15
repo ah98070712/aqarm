@@ -13,7 +13,7 @@ def scrape_data(page_id):
     return ''
 
 def extract_contacts(page_content):
-    phones = set(re.findall(r'\+201\d{9}|01\d{9}', page_content))
+    phones = set(re.findall(r'\b\d{11}\b', page_content))
     emails = set(re.findall(r'[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+', page_content))
     return phones, emails
 
@@ -29,9 +29,13 @@ if __name__ == '__main__':
     all_emails = set()
     for i in range(1, 1001):
         content = scrape_data(i)
+        print(f'Scraping page {i}...')
         if content:
             phones, emails = extract_contacts(content)
             all_phones.update(phones)
             all_emails.update(emails)
+            print(f'Page {i}: Found {len(phones)} phone numbers and {len(emails)} emails.')
+        else:
+            print(f'Page {i}: No content found.')
     save_results(all_phones, all_emails)
-  
+    print('Scraping complete. Results have been saved.')
