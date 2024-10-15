@@ -1,3 +1,33 @@
-name: Manual Scrape Trigger\n\non:\n  workflow_dispatch:\n\n
-jobs:\n  scrape:\n    runs-on: ubuntu-latest\n    steps:\n      - name: Checkout repository\n        uses: actions/checkout@v2\n        with:\n          token: "{{secrets.GITHUB_TOKEN}}"\n\n
-      - name: Set up Python\n        uses: actions/setup-python@v2\n        with:\n          python-version: '3.x'\n\n      - name: Install dependencies\n        run: pip install requests\n\n      - name: Run scraper\n        run: python scraper.py\n\n      - name: Push results\n        run: |\n          git config --global user.email 'action@github.com'\n          git config --global user.name 'GitHub Action'\n          git add results/*.txt\n          git commit -m 'Add scrape results' || echo 'No changes to commit'\n          git push\n
+name: Manual Scrape Trigger
+
+on:
+  workflow_dispatch:
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          token: "${{ secrets.GIT_TOKEN }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run scraper
+        run: python scraper.py
+
+      - name: Push results
+        run: |
+          git config --global user.email 'action@github.com'
+          git config --global user.name 'GitHub Action'
+          git add results/*.txt
+          git commit -m 'Add scrape results' || echo 'No changes to commit'
+          git push
+
