@@ -26,7 +26,7 @@ jobs:
         run: |
           echo "Installing Firefox and necessary dependencies..."
           sudo apt-get update
-          sudo apt-get install -y firefox wget xvfb libxi6 libgconf-2-4
+          sudo apt-get install -y firefox wget xvfb libxi6
 
       - name: Setup GeckoDriver
         run: |
