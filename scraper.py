@@ -1,10 +1,16 @@
 import requests
 import re
 import datetime
+import time
 
 def scrape_data(page_id):
     url = f'https://aqarmap.com.eg/ar/listing/{page_id}-a/'
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate',
+        'Connection': 'keep-alive'
+    }
 
     try:
         response = requests.get(url, headers=headers)
@@ -40,5 +46,6 @@ if __name__ == '__main__':
             print(f'Page {i}: Found {len(phones)} phone numbers and {len(emails)} emails.')
         else:
             print(f'Page {i}: No content found.')
+        time.sleep(2)  # Delay to be polite to the server
     save_results(all_phones, all_emails)
     print('Scraping complete. Results have been saved.')
