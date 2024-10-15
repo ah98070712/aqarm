@@ -4,7 +4,7 @@ import datetime
 import time
 
 def scrape_data(page_id):
-    url = f'https://aqarmap.com.eg/ar/listing/{page_id}-a/'
+    url = f'https://140online.com/company/NW{page_id}/a/'
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         'Accept-Language': 'en-US,en;q=0.9',
@@ -36,7 +36,7 @@ def save_results(phones, emails):
 if __name__ == '__main__':
     all_phones = set()
     all_emails = set()
-    for i in range(1, 1001):
+    for i in range(1, 10):
         print(f'Scraping page {i}...')
         content = scrape_data(i)
         if content:
