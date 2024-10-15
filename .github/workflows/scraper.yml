@@ -31,7 +31,7 @@ jobs:
       - name: Setup GeckoDriver
         run: |
           echo "Setting up GeckoDriver..."
-          GECKODRIVER_VERSION=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest | grep 'tag_name' | cut -d '"' -f 4)
+          GECKODRIVER_VERSION=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
           echo "Detected GeckoDriver version: $GECKODRIVER_VERSION"
           wget -N "https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz"
           tar -xzf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz -C $HOME
