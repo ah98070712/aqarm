@@ -18,16 +18,33 @@ jobs:
           python-version: '3.x'
 
       - name: Install dependencies
-        run: pip install requests
+        run: |
+          echo "Installing dependencies..."
+          pip install requests
 
       - name: Run scraper
-        run: python scraper.py
+        run: |
+          echo "Running the scraper script..."
+          python scraper.py
+
+      - name: List results directory
+        run: |
+          echo "Listing the files in the results directory..."
+          ls -l results/
+
+      - name: Display file content
+        run: |
+          echo "Displaying the content of results files..."
+          cat results/* || echo "No results found."
 
       - name: Push results
         run: |
+          echo "Configuring Git user..."
           git config --global user.email 'action@github.com'
           git config --global user.name 'GitHub Action'
+          echo "Adding result files..."
           git add results/*.txt
+          echo "Committing result files..."
           git commit -m 'Add scrape results' || echo 'No changes to commit'
+          echo "Pushing changes to repository..."
           git push
-
