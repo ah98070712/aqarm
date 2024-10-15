@@ -1,10 +1,10 @@
-name: Debug Setup ChromeDriver
+name: Setup Firefox and GeckoDriver
 
 on:
   workflow_dispatch:
 
 jobs:
-  debug:
+  run:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -22,34 +22,28 @@ jobs:
           echo "Installing dependencies..."
           pip install requests selenium
 
-      - name: Install Google Chrome
+      - name: Install Firefox
         run: |
-          echo "Installing Google Chrome..."
-          wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-          sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+          echo "Installing Firefox..."
           sudo apt-get update
-          sudo apt-get install -y google-chrome-stable
+          sudo apt-get install -y firefox
 
-      - name: Setup ChromeDriver
+      - name: Setup GeckoDriver
         run: |
-          echo "Setting up ChromeDriver..."
-          GOOGLE_CHROME_VERSION=$(google-chrome --version | grep -o -E '[0-9]+\.[0-9]+\.[0-9]+')
-          MAJOR_VERSION=$(echo $GOOGLE_CHROME_VERSION | cut -d '.' -f 1)
-          echo "Extracted Google Chrome version: $GOOGLE_CHROME_VERSION"
-          echo "Determined ChromeDriver compatible major version: $MAJOR_VERSION"
-          CHROMEDRIVER_VERSION=$(curl -sS "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$MAJOR_VERSION")
-          echo "Matching ChromeDriver version: $CHROMEDRIVER_VERSION"
-          wget -N "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
-          unzip chromedriver_linux64.zip -d $HOME
-          rm chromedriver_linux64.zip
-          sudo mv -f $HOME/chromedriver /usr/local/bin/chromedriver
-          sudo chmod +x /usr/local/bin/chromedriver
+          echo "Setting up GeckoDriver..."
+          GECKODRIVER_VERSION=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest | grep 'tag_name' | cut -d '"' -f 4)
+          echo "Detected GeckoDriver version: $GECKODRIVER_VERSION"
+          wget -N "https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz"
+          tar -xzf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz -C $HOME
+          rm geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
+          sudo mv -f $HOME/geckodriver /usr/local/bin/geckodriver
+          sudo chmod +x /usr/local/bin/geckodriver
 
       - name: Test Version
         run: |
           echo "Verifying installations..."
-          google-chrome --version
-          chromedriver --version
+          firefox --version
+          geckodriver --version
 
       - name: Run scraper
         env:
