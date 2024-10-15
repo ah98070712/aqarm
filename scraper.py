@@ -4,8 +4,11 @@ import datetime
 
 def scrape_data(page_id):
     url = f'https://aqarmap.com.eg/ar/listing/{page_id}-a/'
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=headers)
+        print(f'Page {page_id} status code: {response.status_code}')
         if response.status_code == 200:
             return response.text
     except requests.RequestException as e:
@@ -28,8 +31,8 @@ if __name__ == '__main__':
     all_phones = set()
     all_emails = set()
     for i in range(1, 1001):
-        content = scrape_data(i)
         print(f'Scraping page {i}...')
+        content = scrape_data(i)
         if content:
             phones, emails = extract_contacts(content)
             all_phones.update(phones)
