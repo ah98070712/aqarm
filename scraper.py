@@ -36,7 +36,7 @@ def save_results(phones, emails):
 if __name__ == '__main__':
     all_phones = set()
     all_emails = set()
-    for i in range(1, 10):
+    for i in range(7609, 7620):
         print(f'Scraping page {i}...')
         content = scrape_data(i)
         if content:
