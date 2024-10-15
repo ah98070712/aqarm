@@ -1,10 +1,10 @@
-name: Setup Firefox and GeckoDriver
+name: Manual Scrape Trigger
 
 on:
   workflow_dispatch:
 
 jobs:
-  run:
+  scrape:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -19,41 +19,23 @@ jobs:
 
       - name: Install dependencies
         run: |
-          echo "Installing selenium..."
-          pip install requests selenium
+          echo "Installing dependencies..."
+          pip install requests
 
-      - name: Install Firefox and Required Dependencies
+      - name: Run scraper
         run: |
-          echo "Installing Firefox and necessary dependencies..."
-          sudo apt-get update
-          sudo apt-get install -y firefox wget xvfb libxi6
-
-      - name: Setup GeckoDriver
-        run: |
-          echo "Setting up GeckoDriver..."
-          GECKODRIVER_VERSION=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest | grep -Po '"tag_name": "\K.*?(?=")')
-          echo "Detected GeckoDriver version: $GECKODRIVER_VERSION"
-          echo "Download URL: https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz"
-          wget -N "https://github.com/mozilla/geckodriver/releases/download/$GECKODRIVER_VERSION/geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz"
-          ls -l geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
-          tar -xzf geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz -C $HOME
-          rm geckodriver-$GECKODRIVER_VERSION-linux64.tar.gz
-          sudo mv -f $HOME/geckodriver /usr/local/bin/geckodriver
-          sudo chmod +x /usr/local/bin/geckodriver
-
-      - name: Test Version
-        run: |
-          echo "Verifying installations..."
-          firefox --version
-          geckodriver --version
-
-      - name: Start XVFB and Run scraper
-        run: |
-          echo "Running XVFB and scraper..."
-          XVFB_DISPLAY=":99"
-          Xvfb $XVFB_DISPLAY -ac -screen 0 1280x1024x16 &
-          export DISPLAY=$XVFB_DISPLAY
+          echo "Running the scraper script..."
           python scraper.py
+
+      - name: List results directory
+        run: |
+          echo "Listing the files in the results directory..."
+          ls -l results/
+
+      - name: Display file content
+        run: |
+          echo "Displaying the content of results files..."
+          cat results/* || echo "No results found."
 
       - name: Push results
         run: |
@@ -62,5 +44,7 @@ jobs:
           git config --global user.name 'GitHub Action'
           echo "Adding result files..."
           git add results/*.txt
+          echo "Committing result files..."
           git commit -m 'Add scrape results' || echo 'No changes to commit'
+          echo "Pushing changes to repository..."
           git push
