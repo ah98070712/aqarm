@@ -1,5 +1,5 @@
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.firefox.options import Options
 import re
 import datetime
 import os
@@ -8,7 +8,7 @@ import time
 def setup_driver():
     options = Options()
     options.headless = True
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Firefox(options=options)
     return driver
 
 def scrape_data(driver, page_id):
@@ -51,4 +51,3 @@ if __name__ == '__main__':
     save_results(all_phones, all_emails)
     driver.quit()
     print('Scraping complete. Results have been saved.')
-    
