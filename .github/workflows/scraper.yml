@@ -22,17 +22,27 @@ jobs:
           echo "Installing dependencies..."
           pip install requests selenium
 
+      - name: Install chromium-browser
+        run: |
+          echo "Installing Chromium..."
+          sudo apt-get update
+          sudo apt-get install -y chromium-browser
+
       - name: Setup ChromeDriver
         run: |
           echo "Setting up ChromeDriver..."
-          sudo apt-get update
-          sudo apt-get install -y wget unzip
-          wget -N https://chromedriver.storage.googleapis.com/`curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip
+          sudo apt-get remove -y google-chrome-stable
+          LATEST_VERSION=$(curl -sS https://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+          wget -N https://chromedriver.storage.googleapis.com/${LATEST_VERSION}/chromedriver_linux64.zip
           unzip chromedriver_linux64.zip -d $HOME
           rm chromedriver_linux64.zip
           sudo mv -f $HOME/chromedriver /usr/local/bin/chromedriver
           sudo chmod +x /usr/local/bin/chromedriver
-          sudo apt-get install -y chromium-browser
+
+      - name: Test ChromeDriver and Chrome version
+        run: |
+          google-chrome --version
+          chromedriver --version
 
       - name: Run scraper
         run: python scraper.py
