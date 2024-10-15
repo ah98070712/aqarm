@@ -13,7 +13,7 @@ def scrape_data(page_id):
     return ''
 
 def extract_contacts(page_content):
-    phones = set(re.findall(r'\b\d{11}\b', page_content))
+    phones = set(re.findall(r'\+201\d{9}|01\d{9}', page_content))
     emails = set(re.findall(r'[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+', page_content))
     return phones, emails
 
