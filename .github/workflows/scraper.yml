@@ -19,14 +19,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          echo "Installing dependencies..."
+          echo "Installing selenium..."
           pip install requests selenium
 
-      - name: Install Firefox
+      - name: Install Firefox and Required Dependencies
         run: |
-          echo "Installing Firefox..."
+          echo "Installing Firefox and necessary dependencies..."
           sudo apt-get update
-          sudo apt-get install -y firefox
+          sudo apt-get install -y firefox wget xvfb libxi6 libgconf-2-4
 
       - name: Setup GeckoDriver
         run: |
@@ -45,10 +45,13 @@ jobs:
           firefox --version
           geckodriver --version
 
-      - name: Run scraper
-        env:
-          PATH: /usr/local/bin:$PATH
-        run: python scraper.py
+      - name: Start XVFB and Run scraper
+        run: |
+          echo "Running XVFB and scraper..."
+          XVFB_DISPLAY=":99"
+          Xvfb $XVFB_DISPLAY -ac -screen 0 1280x1024x16 &
+          export DISPLAY=$XVFB_DISPLAY
+          python scraper.py
 
       - name: Push results
         run: |
