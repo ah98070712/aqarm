@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
+import subprocess
 import re
 import datetime
 import os
@@ -9,7 +10,15 @@ import time
 def setup_driver():
     options = Options()
     options.headless = True
-    options.binary_location = '/usr/bin/firefox'  # Explicitly specify binary location
+    options.binary_location = '/usr/bin/firefox'  # Specify the default guess location
+
+    # Verify Firefox installation path
+    try:
+        firefox_path = subprocess.check_output(['which', 'firefox']).decode().strip()
+        print(f"Firefox binary detected at: {firefox_path}")
+    except Exception as e:
+        print(f"Error detecting Firefox binary: {e}")
+    
     service = Service(log_path='geckodriver.log')
     driver = webdriver.Firefox(service=service, options=options)
     return driver
