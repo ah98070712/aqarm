@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
 import re
 import datetime
 import os
@@ -8,10 +9,9 @@ import time
 def setup_driver():
     options = Options()
     options.headless = True
-    # Add more verbose logging for debugging
-    service_log_path = "./geckodriver.log"
-    service_args = ['--log', 'debug']
-    driver = webdriver.Firefox(options=options, service_log_path=service_log_path, service_args=service_args)
+    # Correctly configure the service for geckodriver
+    service = Service(log_path='geckodriver.log')
+    driver = webdriver.Firefox(service=service, options=options)
     return driver
 
 def scrape_data(driver, page_id):
