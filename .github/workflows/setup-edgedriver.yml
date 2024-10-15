@@ -1,0 +1,26 @@
+name: Setup EdgeDriver
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Edge and EdgeDriver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y software-properties-common
+          sudo add-apt-repository -y ppa:ubuntu-microsoft-edge-dev/stable
+          sudo apt-get update
+          sudo apt-get install -y microsoft-edge-stable
+
+      - name: Install Python dependencies
+        run: |
+          pip install selenium
+
+      - name: Run scraper
+        run: python scraper.py
