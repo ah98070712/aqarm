@@ -10,7 +10,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          token: "${{ secrets.GIT_TOKEN }}"
+          token: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Set up Python
         uses: actions/setup-python@v2
@@ -20,22 +20,22 @@ jobs:
       - name: Install dependencies
         run: |
           echo "Installing dependencies..."
-          pip install requests
+          pip install requests selenium
+
+      - name: Setup ChromeDriver
+        run: |
+          echo "Setting up ChromeDriver..."
+          sudo apt-get update
+          sudo apt-get install -y wget unzip
+          wget -N https://chromedriver.storage.googleapis.com/`curl -s https://chromedriver.storage.googleapis.com/LATEST_RELEASE`/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip -d $HOME
+          rm chromedriver_linux64.zip
+          sudo mv -f $HOME/chromedriver /usr/local/bin/chromedriver
+          sudo chmod +x /usr/local/bin/chromedriver
+          sudo apt-get install -y chromium-browser
 
       - name: Run scraper
-        run: |
-          echo "Running the scraper script..."
-          python scraper.py
-
-      - name: List results directory
-        run: |
-          echo "Listing the files in the results directory..."
-          ls -l results/
-
-      - name: Display file content
-        run: |
-          echo "Displaying the content of results files..."
-          cat results/* || echo "No results found."
+        run: python scraper.py
 
       - name: Push results
         run: |
