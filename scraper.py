@@ -1,1 +1,51 @@
-from selenium import webdriver\nfrom selenium.webdriver.edge.service import Service as EdgeService\nfrom selenium.webdriver.edge.options import Options as EdgeOptions\nimport re\nimport datetime\nimport os\nimport time\n\ndef setup_driver():\n    options = EdgeOptions()\n    options.use_chromium = True\n    options.headless = True\n    # Modify executable path if necessary. See setup in workflow for exact location\n    service = EdgeService(executable_path='/usr/bin/msedge')\n    driver = webdriver.Edge(service=service, options=options)\n    return driver\n\ndef scrape_data(driver, page_id):\n    url = f'https://aqarmap.com.eg/ar/listing/{page_id}-a/'\n    try:\n        driver.get(url)\n        return driver.page_source\n    except Exception as e:\n        print(f'Error fetching {url}:', e)\n    return ''\ndef extract_contacts(page_content):\n    phones = set(re.findall(r'\b\d{11}\b', page_content))\n    emails = set(re.findall(r'[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+', page_content))\n    return phones, emails\n\ndef save_results(phones, emails):\n    timestamp = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')\n    os.makedirs('results', exist_ok=True)\n    with open(f'results/{timestamp}_phones.txt', 'w') as phone_file:\n        phone_file.write('\n'.join(sorted(phones)))\n    with open(f'results/{timestamp}_emails.txt', 'w') as email_file:\n        email_file.write('\n'.join(sorted(emails)))\n\nif __name__ == '__main__':\n    driver = setup_driver()\n    all_phones = set()\n    all_emails = set()\n    for i in range(1, 1001):\n        print(f'Scraping page {i}...')\n        content = scrape_data(driver, i)\n        if content:\n            phones, emails = extract_contacts(content)\n            all_phones.update(phones)\n            all_emails.update(emails)\n            print(f'Page {i}: Found {len(phones)} phone numbers and {len(emails)} emails.')\n        else:\n            print(f'Page {i}: No content found.')\n    save_results(all_phones, all_emails)\n    driver.quit()\n    print('Scraping complete. Results have been saved.')\n
+import requests
+import re
+import datetime
+import time
+
+def scrape_data(page_id):
+    url = f'https://aqarmap.com.eg/ar/listing/{page_id}-a/'
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate',
+        'Connection': 'keep-alive'
+    }
+
+    try:
+        response = requests.get(url, headers=headers)
+        print(f'Page {page_id} status code: {response.status_code}')
+        if response.status_code == 200:
+            return response.text
+    except requests.RequestException as e:
+        print(f'Error fetching {url}:', e)
+    return ''
+
+def extract_contacts(page_content):
+    phones = set(re.findall(r'\b\d{11}\b', page_content))
+    emails = set(re.findall(r'[a-zA-Z0-9.-]+@[a-zA-Z0-9.-]+', page_content))
+    return phones, emails
+
+def save_results(phones, emails):
+    timestamp = datetime.datetime.now().strftime('%Y-%m-%d-%H-%M-%S')
+    with open(f'results/{timestamp}_phones.txt', 'w') as phone_file:
+        phone_file.write('\n'.join(sorted(phones)))
+    with open(f'results/{timestamp}_emails.txt', 'w') as email_file:
+        email_file.write('\n'.join(sorted(emails)))
+
+if __name__ == '__main__':
+    all_phones = set()
+    all_emails = set()
+    for i in range(1, 1001):
+        print(f'Scraping page {i}...')
+        content = scrape_data(i)
+        if content:
+            phones, emails = extract_contacts(content)
+            all_phones.update(phones)
+            all_emails.update(emails)
+            print(f'Page {i}: Found {len(phones)} phone numbers and {len(emails)} emails.')
+        else:
+            print(f'Page {i}: No content found.')
+        time.sleep(2)  # Delay to be polite to the server
+    save_results(all_phones, all_emails)
+    print('Scraping complete. Results have been saved.')
