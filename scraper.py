@@ -4,7 +4,7 @@ import datetime
 import time
 
 def scrape_data(page_id):
-    url = f'https://140online.com/company/NW{page_id}/a/'
+    url = f'https://140online.com/Company.aspx?CompanyId=NW{page_id}'
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         'Accept-Language': 'en-US,en;q=0.9',
